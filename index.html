@@ -367,17 +367,26 @@ input:focus,select:focus{border-color:var(--blue)}
     <div id="notif-status-bar" style="margin-bottom:10px;display:none">
       <div id="notif-status-text" style="font-size:12px;padding:8px 12px;border-radius:var(--radius-sm);text-align:center"></div>
     </div>
-    <!-- Who -->
+    <!-- Date type toggle -->
     <div class="field">
-      <div class="lbl">新增對象</div>
+      <div class="lbl">日期類型</div>
       <div class="att-toggle">
-        <button class="att-opt sel-present" id="rem-who-p" onclick="setRemWho('peggy')" style="border-radius:0">🎒 Peggy</button>
-        <button class="att-opt" id="rem-who-e" onclick="setRemWho('elsie')" style="border-radius:0">📚 Elsie</button>
+        <button class="att-opt sel-present" id="rem-type-single" onclick="setRemType('single')">單一日期</button>
+        <button class="att-opt" id="rem-type-range" onclick="setRemType('range')">日期範圍</button>
       </div>
     </div>
-    <div class="row2">
+    <!-- Single date -->
+    <div id="rem-single-row" class="row2">
       <div><div class="lbl">日期</div><input type="date" id="rem-date"></div>
       <div><div class="lbl">時間</div><input type="time" id="rem-time"></div>
+    </div>
+    <!-- Date range -->
+    <div id="rem-range-row" style="display:none;margin-bottom:12px">
+      <div class="row2" style="margin-bottom:8px">
+        <div><div class="lbl">開始日期</div><input type="date" id="rem-date-start"></div>
+        <div><div class="lbl">結束日期</div><input type="date" id="rem-date-end"></div>
+      </div>
+      <div><div class="lbl">時間（選填）</div><input type="time" id="rem-time-range"></div>
     </div>
     <div class="row2">
       <div>
@@ -488,8 +497,13 @@ document.getElementById('s-date').value=nowDate();
 document.getElementById('s-time').value=nowTime();
 (function(){
   var d=new Date();d.setDate(d.getDate()+7);
-  document.getElementById('rem-date').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  var fmt=function(dt){return dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());};
+  document.getElementById('rem-date').value=fmt(d);
   document.getElementById('rem-time').value=nowTime();
+  document.getElementById('rem-date-start').value=fmt(d);
+  var d2=new Date(d);d2.setDate(d2.getDate()+3);
+  document.getElementById('rem-date-end').value=fmt(d2);
+  document.getElementById('rem-time-range').value=nowTime();
 })();
 
 // ── Tabs ───────────────────────────────────────
@@ -584,18 +598,14 @@ function clearAll(){
 // ── Reminders ──────────────────────────────────
 // ── Reminder who ──────────────────────────────
 var remWho='peggy';
-function setRemWho(who){
-  remWho=who;
-  var pp=document.getElementById('rem-who-p');
-  var ep=document.getElementById('rem-who-e');
-  pp.className='att-opt'+(who==='peggy'?' sel-present':'');
-  ep.className='att-opt'+(who==='elsie'?' sel-present':'');
-  if(who==='elsie'){
-    pp.style.cssText='border-radius:0';ep.style.cssText='border-radius:0;background:var(--teal-bg);color:var(--teal)';
-  } else {
-    pp.style.cssText='border-radius:0';ep.style.cssText='border-radius:0';
-    pp.className='att-opt sel-present';
-  }
+var remType='single';
+
+function setRemType(type){
+  remType=type;
+  document.getElementById('rem-type-single').className='att-opt'+(type==='single'?' sel-present':'');
+  document.getElementById('rem-type-range').className='att-opt'+(type==='range'?' sel-present':'');
+  document.getElementById('rem-single-row').style.display=type==='single'?'':'none';
+  document.getElementById('rem-range-row').style.display=type==='range'?'block':'none';
 }
 setRemWho('peggy');
 
@@ -666,19 +676,32 @@ function scheduleNotification(dateStr, timeStr, advanceMin, label){
 }
 
 function addReminder(){
-  var date=document.getElementById('rem-date').value;
-  var time=document.getElementById('rem-time').value;
   var note=document.getElementById('rem-note').value.trim();
   var adv=parseInt(document.getElementById('rem-advance').value,10);
-  if(!date){showToast('請選擇日期');return;}
-  if(!time){showToast('請選擇時間');return;}
   var who=remWho;
   var name=who==='peggy'?'Peggy':'Elsie';
-  var label=note||(name+'的鋼琴課事項');
-  reminders.push({date:date,time:time,note:label,advance:adv,who:who});
+  var label=note||(name+'的事項');
+
+  if(remType==='single'){
+    var date=document.getElementById('rem-date').value;
+    var time=document.getElementById('rem-time').value;
+    if(!date){showToast('請選擇日期');return;}
+    if(!time){showToast('請選擇時間');return;}
+    reminders.push({date:date,time:time,note:label,advance:adv,who:who,type:'single'});
+    scheduleNotification(date,time,adv,'['+name+'] '+label);
+    showToast('事項已加入 ✓');
+  } else {
+    var dStart=document.getElementById('rem-date-start').value;
+    var dEnd=document.getElementById('rem-date-end').value;
+    var time=document.getElementById('rem-time-range').value||'00:00';
+    if(!dStart||!dEnd){showToast('請選擇日期範圍');return;}
+    if(dStart>dEnd){showToast('開始日期不能晚於結束日期');return;}
+    reminders.push({date:dStart,dateEnd:dEnd,time:time,note:label,advance:adv,who:who,type:'range'});
+    showToast('日期範圍事項已加入 ✓');
+  }
+
   saveAll();
   document.getElementById('rem-note').value='';
-  scheduleNotification(date,time,adv,'['+name+'] '+label);
   renderCal();
 }
 
@@ -716,7 +739,20 @@ function renderCal(){
       addEv(r.date,'lesson');
     }
   });
-  reminders.forEach(function(r){addEv(r.date,r.who==='elsie'?'reminder-e':'reminder-p');});
+  reminders.forEach(function(r){
+    var evType=r.who==='elsie'?'reminder-e':'reminder-p';
+    if(r.type==='range'&&r.dateEnd){
+      var cur=new Date(r.date+'T00:00:00');
+      var end=new Date(r.dateEnd+'T00:00:00');
+      while(cur<=end){
+        var ds=cur.getFullYear()+'-'+pad(cur.getMonth()+1)+'-'+pad(cur.getDate());
+        addEv(ds,evType);
+        cur.setDate(cur.getDate()+1);
+      }
+    } else {
+      addEv(r.date,evType);
+    }
+  });
 
   var firstDay=new Date(calYear,calMonth,1).getDay();
   var daysInMonth=new Date(calYear,calMonth+1,0).getDate();
@@ -762,10 +798,17 @@ function showDay(dateStr){
     }
   });
   reminders.forEach(function(r,i){
-    if(r.date===dateStr){
+    var inRange=false;
+    if(r.type==='range'&&r.dateEnd){
+      inRange=(dateStr>=r.date&&dateStr<=r.dateEnd);
+    } else {
+      inRange=(r.date===dateStr);
+    }
+    if(inRange){
       var rName=r.who==='elsie'?'Elsie':'Peggy';
       var rColor=r.who==='elsie'?'var(--teal)':'var(--purple)';
-      items.push({type:'reminder',name:'🔔 '+r.note,sub:rName+' · '+r.time,color:rColor,idx:i});
+      var rangeSub=r.type==='range'?fmtDate(r.date)+' ~ '+fmtDate(r.dateEnd):r.time;
+      items.push({type:'reminder',name:'🔔 '+r.note,sub:rName+' · '+rangeSub,color:rColor,idx:i});
     }
   });
   if(!items.length){document.getElementById('day-detail').classList.remove('visible');return;}
