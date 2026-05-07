@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1F324F" />
+  <meta name="description" content="收藏日本各地宮、社、寺、院的御朱印" />
+
+  <title>御朱印帳</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./favicon.png" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json" />
+
+  <!-- iOS-specific PWA tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="御朱印帳" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Klee+One:wght@400;600&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Pre-built CSS (only the Tailwind utilities used by this app) -->
+  <link rel="stylesheet" href="./styles.css">
+
+  <!-- React via importmap (ES modules from esm.sh) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.3.1",
+      "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+      "react-dom": "https://esm.sh/react-dom@18.3.1",
+      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+      "lucide-react": "https://esm.sh/lucide-react@0.400.0?deps=react@18.3.1"
+    }
+  }
+  </script>
+
+  <!-- Babel for in-browser JSX transformation -->
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+  <style>
+    * {
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+    ::-webkit-scrollbar { display: none; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: #F5EFE3;
+    }
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      box-sizing: border-box;
+      /* No padding-bottom — nav extends to screen bottom and handles home indicator inset itself */
+    }
+    #root {
+      height: 100%;
+      width: 100%;
+    }
+    input, textarea, button, select {
+      font-family: inherit;
+    }
+    input::placeholder, textarea::placeholder {
+      color: rgba(58, 47, 38, 0.4);
+    }
+    button {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Loading screen */
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #F5EFE3;
+      z-index: 9999;
+      transition: opacity 0.15s ease;
+    }
+    #loading.hidden { opacity: 0; pointer-events: none; }
+    #loading .icon {
+      width: 96px;
+      height: 96px;
+      margin-bottom: 18px;
+      filter: drop-shadow(0 4px 20px rgba(0,0,0,0.2));
+    }
+    #loading .text {
+      color: #3A2F26;
+      font-family: "Shippori Mincho", serif;
+      font-size: 14px;
+      letter-spacing: 0.2em;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading screen shown until React mounts -->
+  <div id="loading">
+    <svg class="icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="lbg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#3D5878"/>
+          <stop offset="50%" stop-color="#1F324F"/>
+          <stop offset="100%" stop-color="#0F1A2D"/>
+        </linearGradient>
+        <linearGradient id="lslip" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#F5EFE3"/>
+          <stop offset="100%" stop-color="#E8DCC0"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="100" height="100" rx="22.5" ry="22.5" fill="url(#lbg)"/>
+      <rect x="33" y="13" width="34" height="74" rx="1.5" ry="1.5" fill="#000" opacity="0.18" transform="translate(0,1)"/>
+      <rect x="33" y="13" width="34" height="74" rx="1.5" ry="1.5" fill="url(#lslip)"/>
+      <rect x="35.5" y="15.5" width="29" height="69" fill="none" stroke="#A5874B" stroke-width="0.7" opacity="0.7"/>
+      <rect x="37" y="17" width="26" height="66" fill="none" stroke="#A5874B" stroke-width="0.3" opacity="0.45"/>
+      <text x="50" y="32" text-anchor="middle" fill="#1A1410" font-family="'Shippori Mincho','Noto Serif JP',serif" font-size="13.5" font-weight="700">御</text>
+      <text x="50" y="48" text-anchor="middle" fill="#1A1410" font-family="'Shippori Mincho','Noto Serif JP',serif" font-size="13.5" font-weight="700">朱</text>
+      <text x="50" y="64" text-anchor="middle" fill="#1A1410" font-family="'Shippori Mincho','Noto Serif JP',serif" font-size="13.5" font-weight="700">印</text>
+      <text x="50" y="80" text-anchor="middle" fill="#1A1410" font-family="'Shippori Mincho','Noto Serif JP',serif" font-size="13.5" font-weight="700">帳</text>
+    </svg>
+    <div class="text">御朱印帳</div>
+  </div>
+
+  <div id="root"></div>
+
+  <!-- App code: manually transform JSX with Babel and load as ES module -->
+  <script type="module">
+    // Wait for Babel global to be available
+    while (typeof Babel === 'undefined') {
+      await new Promise(r => setTimeout(r, 50));
+    }
+
+    try {
+      // Fetch app.js source
+      const response = await fetch('./app.js');
+      if (!response.ok) throw new Error('Failed to load app.js: ' + response.status);
+      let code = await response.text();
+
+      // Compatibility: in case app.js component is named GoshuinApp but createRoot uses <App />
+      code = code.replace(/<App\s*\/>/g, '<GoshuinApp />');
+
+      // Transform JSX → JS, preserving ES module syntax (no module transform plugin)
+      const { code: compiled } = Babel.transform(code, {
+        presets: ['react'],
+        plugins: [],
+        sourceType: 'module',
+      });
+
+      // Load compiled code as ES module via blob URL (ensures top-level imports work)
+      const blob = new Blob([compiled], { type: 'application/javascript' });
+      const blobUrl = URL.createObjectURL(blob);
+      await import(blobUrl);
+    } catch (err) {
+      console.error('App load error:', err);
+      document.getElementById('loading').innerHTML =
+        '<div style="color:#7A2A1F;font-family:serif;text-align:center;padding:20px">' +
+        '<div style="font-size:18px;margin-bottom:8px">載入失敗</div>' +
+        '<div style="font-size:13px;opacity:0.7">' + err.message + '</div></div>';
+    }
+  </script>
+
+  <!-- Hide loading once React mounts -->
+  <script>
+    // Hide loading screen when #root has children (React rendered)
+    const loadingEl = document.getElementById('loading');
+    const rootEl = document.getElementById('root');
+    const observer = new MutationObserver(() => {
+      if (rootEl.children.length > 0) {
+        loadingEl.classList.add('hidden');
+        setTimeout(() => loadingEl.remove(), 200);
+        observer.disconnect();
+      }
+    });
+    observer.observe(rootEl, { childList: true });
+    // Fallback: hide after 8 seconds regardless
+    setTimeout(() => {
+      if (loadingEl.parentNode) {
+        loadingEl.classList.add('hidden');
+        setTimeout(() => loadingEl.remove(), 200);
+      }
+    }, 8000);
+  </script>
+</body>
+</html>
