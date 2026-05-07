@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Peggy鋼琴課簽到">
+<meta name="theme-color" id="theme-color-meta" content="#1a1a2e">
+<title>Peggy鋼琴課簽到</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#0f0f1a;--surface:#1a1a2e;--surface2:#16213e;--card:#1e1e35;--border:rgba(255,255,255,0.10);--border2:rgba(255,255,255,0.18);--text:#f0f0f5;--text2:#9090b0;--text3:#5a5a7a;--blue:#4f8fe0;--blue-bg:rgba(79,143,224,0.18);--blue-border:rgba(79,143,224,0.4);--teal:#6ee7b7;--teal-bg:rgba(110,231,183,0.15);--teal-border:rgba(110,231,183,0.35);--purple:#a78bfa;--purple-bg:rgba(167,139,250,0.15);--purple-border:rgba(167,139,250,0.35);--amber:#fbbf24;--amber-bg:rgba(251,191,36,0.15);--amber-border:rgba(251,191,36,0.35);--danger:#f87171;--danger-bg:rgba(248,113,113,0.12);--danger-border:rgba(248,113,113,0.3);--radius:14px;--radius-sm:9px}
+[data-theme="light"]{--bg:#f4f4f8;--surface:#ffffff;--surface2:#f0f0f5;--card:#ffffff;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#111118;--text2:#666680;--text3:#aaaacc;--blue:#1a5fb4;--blue-bg:rgba(26,95,180,0.10);--blue-border:rgba(26,95,180,0.35);--teal:#0a7c56;--teal-bg:rgba(10,124,86,0.10);--teal-border:rgba(10,124,86,0.3);--purple:#6030c0;--purple-bg:rgba(96,48,192,0.10);--purple-border:rgba(96,48,192,0.3);--amber:#b45309;--amber-bg:rgba(180,83,9,0.10);--amber-border:rgba(180,83,9,0.3);--danger:#c0392b;--danger-bg:rgba(192,57,43,0.09);--danger-border:rgba(192,57,43,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'SF Pro Display',sans-serif;overflow-x:hidden;transition:background 0.25s,color 0.25s}
+/* Header */
+.app-header{background:var(--surface);border-bottom:0.5px solid var(--border);padding:52px 16px 12px;display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:20}
+.app-icon{width:34px;height:34px;border-radius:9px;background:var(--surface2);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.app-icon svg{width:22px;height:22px}
+.hd-info{flex:1;min-width:0}
+.hd-title{font-size:16px;font-weight:600;color:var(--text)}
+.hd-clock{font-size:11px;color:var(--text2);margin-top:1px}
+.theme-btn{padding:7px 11px;font-size:12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;flex-shrink:0;-webkit-appearance:none}
+/* Tabs */
+.tab-bar{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--surface);border-bottom:0.5px solid var(--border);position:sticky;top:83px;z-index:19}
+.tab{padding:9px 0;text-align:center;font-size:10px;font-weight:500;color:var(--text2);background:transparent;border:none;border-bottom:2.5px solid transparent;cursor:pointer;font-family:inherit;transition:color 0.15s,border-color 0.15s;-webkit-appearance:none;display:block;width:100%}
+.tab-icon{font-size:16px;display:block;margin-bottom:2px}
+.tab.ts{color:var(--blue);border-bottom-color:var(--blue)}
+.tab.tt{color:var(--teal);border-bottom-color:var(--teal)}
+.tab.tcal{color:var(--purple);border-bottom-color:var(--purple)}
+.tab.tsum{color:var(--amber);border-bottom-color:var(--amber)}
+.les-range-label{font-size:11px;color:var(--purple);font-weight:500;padding:4px 0}
+.tab.tnb{color:#e879a0;border-bottom-color:#e879a0}
+/* Notebook */
+.nb-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.nb-who-bar{display:grid;grid-template-columns:1fr 1fr;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px}
+.nb-who-btn{padding:9px 0;text-align:center;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);background:transparent;border:none;font-family:inherit;transition:background 0.15s,color 0.15s;-webkit-appearance:none;display:block;width:100%}
+.nb-who-btn:first-child{border-right:0.5px solid var(--border2)}
+.nb-who-btn.nb-active-p{background:rgba(232,121,160,0.15);color:#e879a0}
+.nb-who-btn.nb-active-e{background:var(--teal-bg);color:var(--teal)}
+.nb-toolbar-wrap{margin-bottom:8px;border-bottom:0.5px solid var(--border);padding-bottom:8px}
+.nb-row1{margin-bottom:6px}
+.nb-row1 select{width:100%;padding:7px 10px;font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--radius-sm);outline:none;-webkit-appearance:none}
+.nb-row2{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.nb-sep{width:1px;height:20px;background:var(--border2);flex-shrink:0}
+.nb-color-dot{width:23px;height:23px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:border-color 0.15s;flex-shrink:0}
+.nb-color-dot.selected{border-color:var(--text)}
+.nb-fmt-btn{min-width:30px;font-size:14px}
+.nb-fmt-btn.active{background:rgba(232,121,160,0.2);color:#e879a0;border-color:rgba(232,121,160,0.5)}
+.nb-tool-btn{padding:5px 10px;font-size:12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;-webkit-appearance:none}
+.nb-tool-btn.active{background:rgba(232,121,160,0.18);color:#e879a0;border-color:rgba(232,121,160,0.4)}
+.nb-color-btn{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:border-color 0.15s}
+.nb-color-btn.selected{border-color:var(--text)}
+.nb-textarea{width:100%;min-height:155px;padding:10px 12px;font-size:15px;font-family:system-ui,-apple-system,sans-serif;background:var(--surface2);color:#111111;border:0.5px solid var(--border2);border-radius:var(--radius-sm);outline:none;line-height:1.7;cursor:text;word-break:break-word}
+.nb-textarea:empty:before{content:attr(data-placeholder);color:var(--text3);pointer-events:none}
+.nb-textarea:focus{border-color:#e879a0}
+.nb-list{margin-top:4px}
+.nb-note-item{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 12px;margin-bottom:8px}
+.nb-note-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.nb-note-who{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500}
+.nb-note-who-p{background:rgba(232,121,160,0.15);color:#e879a0}
+.nb-note-who-e{background:var(--teal-bg);color:var(--teal)}
+.nb-note-time{font-size:11px;color:var(--text3);margin-left:auto}
+.nb-note-date{font-size:11px;font-weight:500;color:var(--text2);flex:1}
+.nb-note-del{background:var(--danger-bg);color:var(--danger);border:0.5px solid var(--danger-border);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit}
+.nb-note-body{font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+/* Sections */
+.section{display:none;padding:14px 14px 56px}
+.section.visible{display:block}
+/* Form */
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.lbl{font-size:11px;color:var(--text2);margin-bottom:5px;letter-spacing:0.06em;text-transform:uppercase}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.field{margin-bottom:12px}
+input[type=date],input[type=time],input[type=text],select{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--radius-sm);outline:none;-webkit-appearance:none;color-scheme:dark light}
+[data-theme="light"] input[type=date],[data-theme="light"] input[type=time]{color-scheme:light}
+input:focus,select:focus{border-color:var(--blue)}
+.name-fixed{padding:10px 12px;font-size:15px;font-weight:600;background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);display:flex;align-items:center;gap:8px}
+.name-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-s{background:var(--blue)}.dot-t{background:var(--teal)}
+.att-toggle{display:grid;grid-template-columns:1fr 1fr;border:0.5px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden}
+.att-opt{padding:10px 0;text-align:center;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);background:transparent;border:none;font-family:inherit;transition:background 0.15s,color 0.15s;-webkit-appearance:none;display:block;width:100%}
+.att-opt:first-child{border-right:0.5px solid var(--border2)}
+.att-opt.sel-present{background:var(--blue-bg);color:var(--blue)}
+.att-opt.sel-absent{background:var(--amber-bg);color:var(--amber)}
+/* Buttons */
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{padding:11px 0;font-size:13px;font-weight:500;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;font-family:inherit;text-align:center;-webkit-appearance:none;transition:opacity 0.1s,transform 0.1s;display:block;width:100%}
+.btn:active{transform:scale(0.96);opacity:0.8}
+.btn-s{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.btn-t{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-border)}
+.btn-cal{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-border)}
+.btn-amber{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)}
+.btn-full{grid-column:1/-1}
+/* Records */
+.rec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.rec-title{font-size:13px;font-weight:500;color:var(--text)}
+.badge{font-size:11px;padding:2px 9px;border-radius:99px;font-weight:500}
+.badge-s{background:var(--blue-bg);color:var(--blue)}
+.badge-t{background:var(--teal-bg);color:var(--teal)}
+.rec-item{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.av-s{background:var(--blue-bg);color:var(--blue)}
+.av-t{background:var(--teal-bg);color:var(--teal)}
+.rec-info{flex:1;min-width:0}
+.rec-name{font-size:13px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.rec-meta{font-size:11px;color:var(--text2);margin-top:2px}
+.pill{font-size:10px;padding:1px 7px;border-radius:99px;font-weight:500}
+.pill-s{background:var(--blue-bg);color:var(--blue)}
+.pill-t{background:var(--teal-bg);color:var(--teal)}
+.pill-present{background:var(--blue-bg);color:var(--blue)}
+.pill-absent{background:var(--amber-bg);color:var(--amber)}
+.empty{text-align:center;padding:24px 0;color:var(--text3);font-size:13px}
+.divider{height:0.5px;background:var(--border);margin:14px 0}
+/* Calendar */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav-btn{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:18px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-appearance:none}
+.cal-nav-btn:active{opacity:0.7}
+.cal-month-label{font-size:16px;font-weight:600;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{text-align:center;font-size:10px;font-weight:500;color:var(--text3);padding:4px 0}
+.cal-day{min-height:52px;border-radius:var(--radius-sm);background:var(--surface2);display:flex;flex-direction:column;align-items:center;padding:5px 3px;cursor:pointer;position:relative;transition:background 0.1s;border:0.5px solid transparent}
+.cal-day:active{opacity:0.7}
+.cal-day.empty{background:transparent;cursor:default;border-color:transparent}
+.cal-day.today{border-color:var(--blue)}
+.cal-day-num{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:3px}
+.cal-day.today .cal-day-num{color:var(--blue);font-weight:700}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-present{background:var(--blue)}
+.dot-absent{background:var(--amber)}
+.dot-lesson{background:#22c55e}
+.dot-reminder-p{background:var(--purple)}
+.dot-reminder-e{background:var(--teal)}
+/* Day detail popup */
+.day-detail{background:var(--card);border:0.5px solid var(--border2);border-radius:var(--radius);padding:14px;margin-top:12px;display:none}
+.day-detail.visible{display:block}
+.day-detail-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.detail-item{padding:8px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px}
+.detail-item:last-child{border-bottom:none}
+.detail-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.detail-info{flex:1}
+.detail-name{font-size:13px;font-weight:500;color:var(--text)}
+.detail-sub{font-size:11px;color:var(--text2);margin-top:1px}
+/* Reminder card */
+.reminder-card{background:var(--card);border:0.5px solid var(--purple-border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.reminder-title{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:12px}
+/* Summary stats */
+.sum-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 8px;text-align:center}
+.stat-n{font-size:24px;font-weight:600}
+.sn{color:var(--blue)}.st{color:var(--teal)}.sa{color:var(--amber)}
+.stat-l{font-size:11px;color:var(--text2);margin-top:3px}
+/* Splash */
+#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:#0f0f1a;transition:opacity 0.5s ease,transform 0.5s ease}
+#splash.hide{opacity:0;pointer-events:none;transform:scale(1.04)}
+[data-theme="light"] #splash{background:#f4f4f8}
+.splash-icon-wrap{position:relative;margin-bottom:28px}
+/* Piano: 7 white keys + 5 black keys overlaid */
+.splash-keys{position:relative;display:flex;gap:3px;align-items:flex-end;height:80px}
+.splash-wkey{width:24px;height:76px;background:#fff;border-radius:0 0 4px 4px;box-shadow:0 4px 12px rgba(0,0,0,0.3);animation:keyPop 0.5s ease both;flex-shrink:0}
+.splash-bkey{width:15px;height:48px;background:#1a1a2e;border-radius:0 0 3px 3px;position:absolute;top:0;z-index:2;animation:keyPop 0.5s ease both;box-shadow:0 3px 6px rgba(0,0,0,0.4)}
+[data-theme="light"] .splash-bkey{background:#1a1a2e}
+.splash-wkey:nth-child(1){animation-delay:0.00s}
+.splash-wkey:nth-child(2){animation-delay:0.07s}
+.splash-wkey:nth-child(3){animation-delay:0.14s}
+.splash-wkey:nth-child(4){animation-delay:0.21s}
+.splash-wkey:nth-child(5){animation-delay:0.28s}
+.splash-wkey:nth-child(6){animation-delay:0.35s}
+.splash-wkey:nth-child(7){animation-delay:0.42s}
+/* Black keys: absolute positioned between white keys */
+/* C#=between 1-2, D#=between 2-3, F#=between 4-5, G#=between 5-6, A#=between 6-7 */
+/* Each white key is 24px wide + 3px gap = 27px per key */
+.bk1{left:16px;animation-delay:0.10s}
+.bk2{left:43px;animation-delay:0.17s}
+.bk3{left:97px;animation-delay:0.31s}
+.bk4{left:124px;animation-delay:0.38s}
+.bk5{left:151px;animation-delay:0.45s}
+@keyframes keyPop{0%{opacity:0;transform:translateY(18px) scaleY(0.7)}60%{transform:translateY(-4px) scaleY(1.04)}100%{opacity:1;transform:translateY(0) scaleY(1)}}
+.splash-glow{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:140px;height:14px;background:var(--blue);border-radius:50%;filter:blur(12px);opacity:0.55;animation:glowPulse 2s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{opacity:0.45;width:130px}50%{opacity:0.7;width:155px}}
+.splash-note{position:absolute;top:-18px;font-size:20px;animation:noteFloat 1.2s ease-out 0.9s both}
+@keyframes noteFloat{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+.splash-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:0.02em;animation:fadeUp 0.6s ease 1s both}
+.splash-sub{font-size:13px;color:var(--text2);margin-top:6px;animation:fadeUp 0.6s ease 1.15s both}
+.splash-dots{display:flex;gap:6px;margin-top:28px;animation:fadeUp 0.6s ease 1.3s both}
+.splash-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:dotBounce 1s ease-in-out infinite}
+.splash-dot:nth-child(2){animation-delay:0.15s;background:var(--purple)}
+.splash-dot:nth-child(3){animation-delay:0.3s;background:var(--teal)}
+@keyframes dotBounce{0%,100%{transform:translateY(0);opacity:0.5}50%{transform:translateY(-6px);opacity:1}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+/* Toast */
+.toast{position:fixed;bottom:34px;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--text);border:0.5px solid var(--border2);font-size:13px;padding:9px 20px;border-radius:99px;opacity:0;transition:opacity 0.25s;pointer-events:none;white-space:nowrap;z-index:999}
+.toast.show{opacity:1}
+.offline-bar{background:var(--danger-bg);color:var(--danger);font-size:12px;text-align:center;padding:6px;border-bottom:0.5px solid var(--danger-border);display:none}
+.offline-bar.show{display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="splash-icon-wrap">
+    <div class="splash-note">🎵</div>
+    <div class="splash-keys">
+      <!-- 7 white keys -->
+      <div class="splash-wkey"></div>
+      <div class="splash-wkey"></div>
+      <div class="splash-wkey"></div>
+      <div class="splash-wkey"></div>
+      <div class="splash-wkey"></div>
+      <div class="splash-wkey"></div>
+      <div class="splash-wkey"></div>
+      <!-- 5 black keys (absolute) -->
+      <div class="splash-bkey bk1"></div>
+      <div class="splash-bkey bk2"></div>
+      <div class="splash-bkey bk3"></div>
+      <div class="splash-bkey bk4"></div>
+      <div class="splash-bkey bk5"></div>
+    </div>
+    <div class="splash-glow"></div>
+  </div>
+  <div class="splash-title">Peggy鋼琴課簽到</div>
+  <div class="splash-sub">Piano Lesson Attendance</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
+<div class="offline-bar" id="offline-bar">目前離線 — 所有功能仍可正常使用</div>
+<div class="app-header">
+  <div class="app-icon">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="7" width="20" height="13" rx="2" stroke="var(--blue)" stroke-width="1.4" fill="none"/>
+      <rect x="4" y="9.5" width="2.5" height="8" rx="1" fill="var(--text)"/>
+      <rect x="7.5" y="9.5" width="2.5" height="8" rx="1" fill="var(--text)"/>
+      <rect x="11" y="9.5" width="2.5" height="8" rx="1" fill="var(--text)"/>
+      <rect x="14.5" y="9.5" width="2.5" height="8" rx="1" fill="var(--text)"/>
+      <rect x="18" y="9.5" width="2" height="8" rx="1" fill="var(--text)"/>
+      <rect x="6" y="9.5" width="2" height="5" rx="1" fill="var(--blue)"/>
+      <rect x="9.5" y="9.5" width="2" height="5" rx="1" fill="var(--blue)"/>
+      <rect x="16" y="9.5" width="2" height="5" rx="1" fill="var(--blue)"/>
+      <line x1="2" y1="12" x2="22" y2="12" stroke="var(--blue)" stroke-width="0.8" opacity="0.4"/>
+    </svg>
+  </div>
+  <div class="hd-info">
+    <div class="hd-title">Peggy鋼琴課簽到</div>
+    <div class="hd-clock" id="live-clock"></div>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()"><span id="theme-icon">🌗</span><span id="theme-label">自動</span></button>
+</div>
+
+<div class="tab-bar">
+  <button class="tab ts" id="tab-s" onclick="switchTab('s')"><span class="tab-icon">✍️</span>簽到</button>
+  <button class="tab" id="tab-cal" onclick="switchTab('cal')"><span class="tab-icon">📅</span>月曆</button>
+  <button class="tab" id="tab-sum" onclick="switchTab('sum')"><span class="tab-icon">📋</span>記錄</button>
+</div>
+
+<!-- 學生 -->
+<div class="section visible" id="sec-s">
+  <div class="card">
+    <div class="row2">
+      <div><div class="lbl">日期</div><input type="date" id="s-date"></div>
+      <div><div class="lbl">時間</div><input type="time" id="s-time"></div>
+    </div>
+    <div class="field">
+      <div class="lbl">學生姓名</div>
+      <div class="name-fixed" style="font-size:17px"><span class="name-dot dot-s"></span>Peggy</div>
+    </div>
+
+    <div class="field">
+      <div class="lbl">備註</div>
+      <input type="text" id="s-note" placeholder="選填，例：今天練了小奏鳴曲">
+    </div>
+    <div class="btn-row" style="margin-top:4px">
+      <button class="btn btn-danger" onclick="submit('s','請假')">✕ 請假</button>
+      <button class="btn btn-s" onclick="submit('s','出席')">✓ 確認簽到</button>
+    </div>
+  </div>
+  <div class="rec-header"><span class="rec-title">學生記錄</span><span class="badge badge-s" id="cnt-s">0 筆</span></div>
+  <div id="list-s"><div class="empty">尚無記錄</div></div>
+  <div class="divider"></div>
+  <button class="btn btn-danger btn-full" onclick="clearList('s')">清除記錄</button>
+</div>
+
+
+<!-- 月曆 -->
+<div class="section" id="sec-cal">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>出席</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>請假</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>上課</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Peggy</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Elsie</div>
+  </div>
+  <div class="card" style="padding:12px">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+      <span class="cal-month-label" id="cal-month-label"></span>
+      <button class="cal-nav-btn" onclick="calNext()">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div class="day-detail" id="day-detail">
+    <div class="day-detail-title" id="day-detail-title"></div>
+    <div id="day-detail-items"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="reminder-card" style="border-color:var(--blue-border)">
+    <div class="reminder-title" style="color:var(--blue);margin-bottom:10px">🎹 新增上課提醒</div>
+    <!-- Date type toggle -->
+    <div class="field">
+      <div class="lbl">日期類型</div>
+      <div class="att-toggle" style="margin-bottom:0">
+        <button class="att-opt sel-present" id="les-type-single" onclick="setLesType('single')">單一日期</button>
+        <button class="att-opt" id="les-type-range" onclick="setLesType('range')">日期範圍</button>
+      </div>
+    </div>
+    <!-- Single date -->
+    <div id="les-single-row" class="row2">
+      <div><div class="lbl">日期</div><input type="date" id="les-date"></div>
+      <div><div class="lbl">時間</div><input type="time" id="les-time"></div>
+    </div>
+    <!-- Date range -->
+    <div id="les-range-row" style="display:none;margin-bottom:12px">
+      <div class="row2" style="margin-bottom:8px">
+        <div><div class="lbl">開始日期</div><input type="date" id="les-date-start"></div>
+        <div><div class="lbl">結束日期</div><input type="date" id="les-date-end"></div>
+      </div>
+      <div class="row2" style="margin-bottom:0">
+        <div><div class="lbl">時間</div><input type="time" id="les-time-range"></div>
+        <div><div class="lbl">重複</div>
+          <select id="les-repeat" style="width:100%;padding:10px 12px;font-size:14px;font-family:inherit;background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--radius-sm);outline:none;-webkit-appearance:none">
+            <option value="daily">每天</option>
+            <option value="weekday">平日（一至五）</option>
+            <option value="none">僅標記範圍</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row2">
+      <div>
+        <div class="lbl">提前通知</div>
+        <select id="les-advance">
+          <option value="0">準時</option>
+          <option value="10" selected>10 分鐘前</option>
+          <option value="30">30 分鐘前</option>
+          <option value="60">1 小時前</option>
+          <option value="1440">1 天前</option>
+        </select>
+      </div>
+      <div>
+        <div class="lbl">備註（選填）</div>
+        <input type="text" id="les-note" placeholder="選填">
+      </div>
+    </div>
+    <button class="btn btn-s btn-full" onclick="addLesson()" style="margin-top:8px">🎹 加入上課提醒</button>
+  </div>
+  <div class="divider"></div>
+  <div class="reminder-card">
+    <div class="reminder-title" style="margin-bottom:10px">🔔 新增事項</div>
+    <div id="notif-status-bar" style="margin-bottom:10px;display:none">
+      <div id="notif-status-text" style="font-size:12px;padding:8px 12px;border-radius:var(--radius-sm);text-align:center"></div>
+    </div>
+    <!-- Date type toggle -->
+    <div class="field">
+      <div class="lbl">日期類型</div>
+      <div class="att-toggle">
+        <button class="att-opt sel-present" id="rem-type-single" onclick="setRemType('single')">單一日期</button>
+        <button class="att-opt" id="rem-type-range" onclick="setRemType('range')">日期範圍</button>
+      </div>
+    </div>
+    <!-- Single date -->
+    <div id="rem-single-row" class="row2">
+      <div><div class="lbl">日期</div><input type="date" id="rem-date"></div>
+      <div><div class="lbl">時間</div><input type="time" id="rem-time"></div>
+    </div>
+    <!-- Date range -->
+    <div id="rem-range-row" style="display:none;margin-bottom:12px">
+      <div class="row2" style="margin-bottom:8px">
+        <div><div class="lbl">開始日期</div><input type="date" id="rem-date-start"></div>
+        <div><div class="lbl">結束日期</div><input type="date" id="rem-date-end"></div>
+      </div>
+      <div><div class="lbl">時間（選填）</div><input type="time" id="rem-time-range"></div>
+    </div>
+    <div class="row2">
+      <div>
+        <div class="lbl">提前通知</div>
+        <select id="rem-advance">
+          <option value="0">準時</option>
+          <option value="10" selected>10 分鐘前</option>
+          <option value="30">30 分鐘前</option>
+          <option value="60">1 小時前</option>
+          <option value="1440">1 天前</option>
+        </select>
+      </div>
+      <div>
+        <div class="lbl">通知狀態</div>
+        <button class="btn" id="notif-perm-btn" onclick="requestNotifPerm()" style="font-size:12px;padding:10px 0">檢查權限</button>
+      </div>
+    </div>
+    <div class="field">
+      <div class="lbl">事項內容</div>
+      <input type="text" id="rem-note" placeholder="例：補課 / 考試 / 休息">
+    </div>
+    <button class="btn btn-cal btn-full" onclick="addReminder()">＋ 加入事項 ＋ 設定通知</button>
+  </div>
+</div>
+
+
+<!-- 記錄 -->
+<div class="section" id="sec-sum">
+  <div class="sum-stats">
+    <div class="stat"><div class="stat-n sn" id="sum-s">0</div><div class="stat-l">出席次數</div></div>
+    <div class="stat"><div class="stat-n sa" id="sum-ab">0</div><div class="stat-l">請假次數</div></div>
+    <div class="stat"><div class="stat-n" id="sum-all" style="color:var(--purple)">0</div><div class="stat-l">總計</div></div>
+  </div>
+  <div class="rec-header"><span class="rec-title">所有記錄</span><span class="badge" style="background:var(--amber-bg);color:var(--amber)" id="cnt-all">0 筆</span></div>
+  <div id="list-all"><div class="empty">尚無記錄</div></div>
+  <div class="divider"></div>
+  <button class="btn btn-danger btn-full" onclick="clearAll()">清除全部記錄</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// ── Theme ──────────────────────────────────────
+var theme=localStorage.getItem('theme')||'auto';
+function applyTheme(t){
+  var dark=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+  var m=document.getElementById('theme-color-meta');if(m)m.content=dark?'#1a1a2e':'#ffffff';
+  document.getElementById('theme-icon').textContent=t==='auto'?'🌗':dark?'🌙':'☀️';
+  document.getElementById('theme-label').textContent=t==='auto'?'自動':dark?'深色':'淺色';
+}
+function toggleTheme(){var o=['auto','dark','light'];theme=o[(o.indexOf(theme)+1)%3];localStorage.setItem('theme',theme);applyTheme(theme);}
+applyTheme(theme);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){if(theme==='auto')applyTheme('auto');});
+
+// ── Clock ──────────────────────────────────────
+function pad(n){return String(n).padStart(2,'0');}
+function nowDate(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function nowTime(){var d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
+function fmtDate(d){return d.replace(/-/g,'/');}
+function updateClock(){
+  var d=new Date(),days=['日','一','二','三','四','五','六'];
+  document.getElementById('live-clock').textContent=d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' 週'+days[d.getDay()]+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+}
+updateClock();setInterval(updateClock,1000);
+
+// ── Data ───────────────────────────────────────
+var recs={s:[],t:[]};
+var reminders=[];
+var notes=[];
+var lessons=[];
+
+// ── Data persistence (localStorage) ──────────────
+function saveAll(){
+  try{
+    var lite={s:[],t:[]};
+    ['s','t'].forEach(function(role){
+      recs[role].forEach(function(r){
+        lite[role].push(Object.assign({},r));
+      });
+    });
+    localStorage.setItem('recs',JSON.stringify(lite));
+    localStorage.setItem('reminders',JSON.stringify(reminders));
+    localStorage.setItem('notes',JSON.stringify(notes));
+    localStorage.setItem('lessons',JSON.stringify(lessons));
+  }catch(e){console.warn('Save error:',e);}
+}
+function loadAll(){
+  try{
+    var raw=localStorage.getItem('recs');
+    if(raw){
+      var lite=JSON.parse(raw);
+      ['s','t'].forEach(function(role){
+        recs[role]=(lite[role]||[]);
+      });
+    }
+    var rr=localStorage.getItem('reminders');if(rr)reminders=JSON.parse(rr);
+    var nn=localStorage.getItem('notes');if(nn)notes=JSON.parse(nn);
+    var ll=localStorage.getItem('lessons');if(ll)lessons=JSON.parse(ll);
+  }catch(e){}
+}
+loadAll();
+
+
+
+
+// ── Defaults ───────────────────────────────────
+document.getElementById('s-date').value=nowDate();
+document.getElementById('s-time').value=nowTime();
+(function(){
+  var d=new Date();d.setDate(d.getDate()+7);
+  var fmt=function(dt){return dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());};
+  document.getElementById('rem-date').value=fmt(d);
+  document.getElementById('rem-time').value=nowTime();
+  document.getElementById('rem-date-start').value=fmt(d);
+  var d2=new Date(d);d2.setDate(d2.getDate()+3);
+  document.getElementById('rem-date-end').value=fmt(d2);
+  document.getElementById('rem-time-range').value=nowTime();
+})();
+
+// ── Tabs ───────────────────────────────────────
+function switchTab(tab){
+  ['s','cal','sum'].forEach(function(k){
+    document.getElementById('sec-'+k).classList.remove('visible');
+    document.getElementById('tab-'+k).classList.remove('ts','tcal','tsum');
+  });
+  document.getElementById('sec-'+tab).classList.add('visible');
+  var cls={s:'ts',cal:'tcal',sum:'tsum'};
+  document.getElementById('tab-'+tab).classList.add(cls[tab]);
+  if(tab==='cal')renderCal();
+  if(tab==='sum')renderSummary();
+}
+
+// ── Toast ──────────────────────────────────────
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2400);
+}
+
+// ── Attendance ─────────────────────────────────
+var attState={s:'出席'};
+function setAtt(role,val){
+  attState.s=val;
+}
+
+// ── Canvas ─────────────────────────────────────
+
+// ── Submit ─────────────────────────────────────
+var NAMES={s:'Peggy',t:'Elsie'};
+function submit(role,att){
+  var date=document.getElementById(role+'-date').value;
+  var time=document.getElementById(role+'-time').value;
+  if(!date){showToast('請選擇日期');return;}
+  if(!time){showToast('請選擇時間');return;}
+  var attendance=att||attState[role]||'出席';
+  var note=document.getElementById(role+'-note').value.trim();
+  recs[role].push({date:date,time:time,name:NAMES[role],att:attendance,sig:'',note:note});
+  document.getElementById(role+'-note').value='';
+  saveAll();
+  renderList(role);
+  // Reset date/time to now for next entry
+  document.getElementById(role+'-date').value=nowDate();
+  document.getElementById(role+'-time').value=nowTime();
+  showToast(NAMES[role]+' '+attendance+' — 完成 ✓');
+}
+
+// ── Render lists ───────────────────────────────
+function attPill(a){return a==='請假'?'<span class="pill pill-absent">請假</span>':'<span class="pill pill-present">出席</span>';}
+function sigEl(r){return '';}
+function renderList(role){
+  document.getElementById('cnt-'+role).textContent=recs[role].length+' 筆';
+  var el=document.getElementById('list-'+role);
+  if(!recs[role].length){el.innerHTML='<div class="empty">尚無記錄</div>';return;}
+  var av=role==='s'?'av-s':'av-t';
+  el.innerHTML=recs[role].map(function(r){
+    return '<div class="rec-item"><div class="avatar '+av+'">'+r.name.slice(0,2)+'</div><div class="rec-info"><div class="rec-name">'+r.name+attPill(r.att)+'</div><div class="rec-meta">'+fmtDate(r.date)+'&nbsp;&nbsp;'+r.time+'</div></div>'+sigEl(r)+'</div>';
+  }).join('');
+}
+
+function renderSummary(){
+  var present=recs.s.filter(function(r){return r.att==='出席';}).length;
+  var absent=recs.s.filter(function(r){return r.att==='請假';}).length;
+  var total=recs.s.length;
+  document.getElementById('sum-s').textContent=present;
+  document.getElementById('sum-ab').textContent=absent;
+  document.getElementById('sum-all').textContent=total;
+  document.getElementById('cnt-all').textContent=total+' 筆';
+  var el=document.getElementById('list-all');
+  if(!recs.s.length){el.innerHTML='<div class="empty">尚無記錄</div>';return;}
+  var sorted=recs.s.slice().sort(function(a,b){return (a.date+a.time)>(b.date+b.time)?-1:1;});
+  el.innerHTML=sorted.map(function(r){
+    return '<div class="rec-item"><div class="avatar av-s">Pe</div><div class="rec-info"><div class="rec-name">'+r.name+attPill(r.att)+(r.note?'<span class="pill" style="background:var(--surface2);color:var(--text2)">'+r.note+'</span>':'')+'</div><div class="rec-meta">'+fmtDate(r.date)+'&nbsp;&nbsp;'+r.time+'</div></div>'+sigEl(r)+'</div>';
+  }).join('');
+}
+
+// ── Clear ──────────────────────────────────────
+function clearList(role){
+  if(!recs[role]||!recs[role].length)return;
+  if(!confirm('確定清除所有記錄？'))return;
+  recs[role]=[];saveAll();renderList(role);
+}
+function clearAll(){
+  if(!recs.s.length&&!reminders.length&&!lessons.length)return;
+  if(!confirm('確定清除全部記錄？'))return;
+  recs.s=[];
+  reminders=[];lessons=[];saveAll();renderList('s');renderSummary();renderCal();
+}
+
+// ── Reminders ──────────────────────────────────
+// ── Reminder who ──────────────────────────────
+var remWho='peggy';
+var remType='single';
+
+function setRemType(type){
+  remType=type;
+  document.getElementById('rem-type-single').className='att-opt'+(type==='single'?' sel-present':'');
+  document.getElementById('rem-type-range').className='att-opt'+(type==='range'?' sel-present':'');
+  document.getElementById('rem-single-row').style.display=type==='single'?'':'none';
+  document.getElementById('rem-range-row').style.display=type==='range'?'block':'none';
+}
+
+// ── Notification helpers ───────────────────────
+function updateNotifPermBtn(){
+  var btn=document.getElementById('notif-perm-btn');
+  var bar=document.getElementById('notif-status-bar');
+  var txt=document.getElementById('notif-status-text');
+  if(!('Notification' in window)){
+    btn.textContent='不支援';
+    btn.style.cssText='font-size:12px;padding:10px 0;background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)';
+    bar.style.display='block';
+    txt.style.cssText='background:var(--danger-bg);color:var(--danger)';
+    txt.textContent='此裝置不支援通知功能';
+    return;
+  }
+  var p=Notification.permission;
+  if(p==='granted'){
+    btn.textContent='✓ 已開啟';
+    btn.style.cssText='font-size:12px;padding:10px 0;background:var(--teal-bg);color:var(--teal);border-color:var(--teal-border)';
+    bar.style.display='block';
+    txt.style.cssText='background:var(--teal-bg);color:var(--teal)';
+    txt.textContent='通知已開啟，提醒將準時送達 🔔';
+  } else if(p==='denied'){
+    btn.textContent='× 被封鎖';
+    btn.style.cssText='font-size:12px;padding:10px 0;background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border)';
+    bar.style.display='block';
+    txt.style.cssText='background:var(--danger-bg);color:var(--danger)';
+    txt.textContent='通知被封鎖，請到手機設定中允許通知';
+  } else {
+    btn.textContent='點此開啟';
+    btn.style.cssText='font-size:12px;padding:10px 0;background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)';
+    bar.style.display='none';
+  }
+}
+function requestNotifPerm(){
+  if(!('Notification' in window)){showToast('此裝置不支援通知');return;}
+  if(Notification.permission==='granted'){showToast('通知已開啟 ✓');return;}
+  if(Notification.permission==='denied'){showToast('請到手機設定中允許通知');return;}
+  Notification.requestPermission().then(function(result){
+    updateNotifPermBtn();
+    if(result==='granted') showToast('通知已開啟！提醒可準時送達 ✓');
+    else showToast('通知未開啟，提醒仍會記錄在月曆');
+  });
+}
+updateNotifPermBtn();
+
+function scheduleNotification(dateStr, timeStr, advanceMin, label){
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  var parts=dateStr.split('-').concat(timeStr.split(':'));
+  var fireTime=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]),parseInt(parts[3]),parseInt(parts[4]),0,0);
+  fireTime=new Date(fireTime.getTime()-advanceMin*60000);
+  var now=new Date();
+  var delay=fireTime.getTime()-now.getTime();
+  if(delay<0){showToast('提醒時間已過，僅記錄在月曆');return;}
+  var maxDelay=2147483647; // ~24.8 days, JS setTimeout max
+  if(delay>maxDelay){showToast('提醒時間太遠，月曆已記錄；請屆時重新設定通知');return;}
+  setTimeout(function(){
+    if(Notification.permission==='granted'){
+      new Notification('🎹 '+label,{
+        body: advanceMin>0?'課堂將在 '+advanceMin+' 分鐘後開始':'課堂現在開始！',
+        icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMwZjBmMWEiLz48cmVjdCB4PSI2IiB5PSIyMCIgd2lkdGg9IjUyIiBoZWlnaHQ9IjMwIiByeD0iNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNGY4ZmUwIiBzdHJva2Utd2lkdGg9IjIiLz48cmVjdCB4PSIxMCIgeT0iMjYiIHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiByeD0iMiIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIxOSIgeT0iMjYiIHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiByeD0iMiIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIyOCIgeT0iMjYiIHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiByeD0iMiIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIzNyIgeT0iMjYiIHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiByeD0iMiIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSI0NiIgeT0iMjYiIHdpZHRoPSI4IiBoZWlnaHQ9IjIwIiByeD0iMiIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIxNCIgeT0iMjYiIHdpZHRoPSI2IiBoZWlnaHQ9IjEzIiByeD0iMiIgZmlsbD0iIzBmMGYxYSIvPjxyZWN0IHg9IjIzIiB5PSIyNiIgd2lkdGg9IjYiIGhlaWdodD0iMTMiIHJ4PSIyIiBmaWxsPSIjMGYwZjFhIi8+PHJlY3QgeD0iNDEiIHk9IjI2IiB3aWR0aD0iNiIgaGVpZ2h0PSIxMyIgcng9IjIiIGZpbGw9IiMwZjBmMWEiLz48L3N2Zz4=',
+        badge: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMwZjBmMWEiLz48L3N2Zz4='
+      });
+    }
+  }, delay);
+  showToast('通知已排程 — '+(advanceMin>0?advanceMin+'分鐘前提醒':'準時提醒')+' ✓');
+}
+
+function addReminder(){
+  var note=document.getElementById('rem-note').value.trim();
+  var adv=parseInt(document.getElementById('rem-advance').value,10);
+  var who=remWho;
+  var name=who==='peggy'?'Peggy':'Elsie';
+  var label=note||(name+'的事項');
+
+  if(remType==='single'){
+    var date=document.getElementById('rem-date').value;
+    var time=document.getElementById('rem-time').value;
+    if(!date){showToast('請選擇日期');return;}
+    if(!time){showToast('請選擇時間');return;}
+    reminders.push({date:date,time:time,note:label,advance:adv,who:who,type:'single'});
+    scheduleNotification(date,time,adv,'['+name+'] '+label);
+    showToast('事項已加入 ✓');
+  } else {
+    var dStart=document.getElementById('rem-date-start').value;
+    var dEnd=document.getElementById('rem-date-end').value;
+    var time=document.getElementById('rem-time-range').value||'00:00';
+    if(!dStart||!dEnd){showToast('請選擇日期範圍');return;}
+    if(dStart>dEnd){showToast('開始日期不能晚於結束日期');return;}
+    reminders.push({date:dStart,dateEnd:dEnd,time:time,note:label,advance:adv,who:who,type:'range'});
+    showToast('日期範圍事項已加入 ✓');
+  }
+
+  saveAll();
+  document.getElementById('rem-note').value='';
+  renderCal();
+}
+
+// ── Calendar ───────────────────────────────────
+var calYear, calMonth;
+(function(){var d=new Date();calYear=d.getFullYear();calMonth=d.getMonth();}());
+
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCal();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCal();}
+
+function renderCal(){
+  var months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('cal-month-label').textContent=calYear+'年 '+months[calMonth];
+  var today=new Date();
+  var todayStr=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+
+  // Build date->events map
+  var evMap={};
+  function addEv(date,type){
+    if(!evMap[date])evMap[date]=[];
+    evMap[date].push(type);
+  }
+  recs.s.forEach(function(r){addEv(r.date,r.att==='請假'?'absent':'present');});
+  recs.t.forEach(function(r){addEv(r.date,r.att==='請假'?'absent':'present');});
+  lessons.forEach(function(r){
+    if(r.type==='range'&&r.dateEnd){
+      var cur=new Date(r.date+'T00:00:00');
+      var end=new Date(r.dateEnd+'T00:00:00');
+      while(cur<=end){
+        var ds=cur.getFullYear()+'-'+pad(cur.getMonth()+1)+'-'+pad(cur.getDate());
+        addEv(ds,'lesson');
+        cur.setDate(cur.getDate()+1);
+      }
+    } else {
+      addEv(r.date,'lesson');
+    }
+  });
+  reminders.forEach(function(r){
+    var evType=r.who==='elsie'?'reminder-e':'reminder-p';
+    if(r.type==='range'&&r.dateEnd){
+      var cur=new Date(r.date+'T00:00:00');
+      var end=new Date(r.dateEnd+'T00:00:00');
+      while(cur<=end){
+        var ds=cur.getFullYear()+'-'+pad(cur.getMonth()+1)+'-'+pad(cur.getDate());
+        addEv(ds,evType);
+        cur.setDate(cur.getDate()+1);
+      }
+    } else {
+      addEv(r.date,evType);
+    }
+  });
+
+  var firstDay=new Date(calYear,calMonth,1).getDay();
+  var daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  var dows=['日','一','二','三','四','五','六'];
+  var html=dows.map(function(d){return '<div class="cal-dow">'+d+'</div>';}).join('');
+
+  for(var i=0;i<firstDay;i++) html+='<div class="cal-day empty"></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var dateStr=calYear+'-'+pad(calMonth+1)+'-'+pad(d);
+    var evs=evMap[dateStr]||[];
+    var isToday=(dateStr===todayStr);
+    var dots='';
+    var seen={};
+    evs.forEach(function(type){
+      if(!seen[type]){seen[type]=true;
+        var cls=type==='present'?'dot-present':type==='absent'?'dot-absent':type==='lesson'?'dot-lesson':type==='reminder-p'?'dot-reminder-p':'dot-reminder-e';
+        dots+='<div class="dot '+cls+'"></div>';
+      }
+    });
+    html+='<div class="cal-day'+(isToday?' today':'')+'" onclick="showDay(\''+dateStr+'\')">'
+      +'<div class="cal-day-num">'+d+'</div>'
+      +(dots?'<div class="cal-dots">'+dots+'</div>':'')
+      +'</div>';
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+  document.getElementById('day-detail').classList.remove('visible');
+}
+
+function showDay(dateStr){
+  var items=[];
+  recs.s.forEach(function(r){if(r.date===dateStr)items.push({type:r.att==='請假'?'absent':'present',name:'Peggy',sub:r.att+' '+r.time+(r.note?' · '+r.note:''),color:'var(--blue)'});});
+  recs.t.forEach(function(r){if(r.date===dateStr)items.push({type:r.att==='請假'?'absent':'present',name:'Elsie',sub:r.att+' '+r.time+(r.note?' · '+r.note:''),color:'var(--teal)'});});
+  lessons.forEach(function(r,i){
+    var inRange=false;
+    if(r.type==='range'&&r.dateEnd){
+      inRange=(dateStr>=r.date&&dateStr<=r.dateEnd);
+    } else {
+      inRange=(r.date===dateStr);
+    }
+    if(inRange){
+      var rangeLabel=r.type==='range'?' ('+fmtDate(r.date)+' ~ '+fmtDate(r.dateEnd)+')':'';
+      items.push({type:'lesson',name:'🎹 上課'+(r.note?' — '+r.note:'')+rangeLabel,sub:r.time,color:'#22c55e',lesIdx:i});
+    }
+  });
+  reminders.forEach(function(r,i){
+    var inRange=false;
+    if(r.type==='range'&&r.dateEnd){
+      inRange=(dateStr>=r.date&&dateStr<=r.dateEnd);
+    } else {
+      inRange=(r.date===dateStr);
+    }
+    if(inRange){
+      var rName=r.who==='elsie'?'Elsie':'Peggy';
+      var rColor=r.who==='elsie'?'var(--teal)':'var(--purple)';
+      var rangeSub=r.type==='range'?fmtDate(r.date)+' ~ '+fmtDate(r.dateEnd):r.time;
+      items.push({type:'reminder',name:'🔔 '+r.note,sub:rName+' · '+rangeSub,color:rColor,idx:i});
+    }
+  });
+  if(!items.length){document.getElementById('day-detail').classList.remove('visible');return;}
+  var parts=dateStr.split('-');
+  document.getElementById('day-detail-title').textContent=parts[0]+'年'+parseInt(parts[1])+'月'+parseInt(parts[2])+'日';
+  document.getElementById('day-detail-items').innerHTML=items.map(function(it,i){
+    var dotColor=it.type==='present'?'var(--blue)':it.type==='absent'?'var(--amber)':'var(--purple)';
+    var del=it.type==='reminder'?'<button onclick="delReminder('+it.idx+')" style="margin-left:auto;background:var(--danger-bg);color:var(--danger);border:0.5px solid var(--danger-border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit">刪除</button>':it.type==='lesson'?'<button onclick="delLesson('+it.lesIdx+')" style="margin-left:auto;background:var(--danger-bg);color:var(--danger);border:0.5px solid var(--danger-border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit">刪除</button>':'';
+    return '<div class="detail-item"><div class="detail-dot" style="background:'+dotColor+'"></div><div class="detail-info"><div class="detail-name">'+it.name+'</div><div class="detail-sub">'+it.sub+'</div></div>'+del+'</div>';
+  }).join('');
+  document.getElementById('day-detail').classList.add('visible');
+}
+
+function delReminder(idx){
+  reminders.splice(idx,1);
+  saveAll();
+  renderCal();
+  showToast('提醒已刪除');
+}
+
+renderCal();
+
+// ── Offline ────────────────────────────────────
+function updateOffline(){document.getElementById('offline-bar').classList.toggle('show',!navigator.onLine);}
+window.addEventListener('online',updateOffline);window.addEventListener('offline',updateOffline);updateOffline();
+
+
+// ── Lesson reminders ──────────────────────────
+(function(){
+  var d=new Date();d.setDate(d.getDate()+7);
+  var fmt=function(dt){return dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());};
+  var ld=document.getElementById('les-date');if(ld)ld.value=fmt(d);
+  var lt=document.getElementById('les-time');if(lt)lt.value=nowTime();
+  var d2=new Date(d);d2.setDate(d2.getDate()+3);
+  var ls=document.getElementById('les-date-start');if(ls)ls.value=fmt(d);
+  var le=document.getElementById('les-date-end');if(le)le.value=fmt(d2);
+  var lr=document.getElementById('les-time-range');if(lr)lr.value=nowTime();
+})();
+
+var lesType='single';
+function setLesType(type){
+  lesType=type;
+  document.getElementById('les-type-single').className='att-opt'+(type==='single'?' sel-present':'');
+  document.getElementById('les-type-range').className='att-opt'+(type==='range'?' sel-present':'');
+  document.getElementById('les-single-row').style.display=type==='single'?'':'none';
+  document.getElementById('les-range-row').style.display=type==='range'?'block':'none';
+}
+
+function addLesson(){
+  var note=document.getElementById('les-note').value.trim();
+  var adv=parseInt(document.getElementById('les-advance').value,10);
+  var label='🎹 鋼琴課'+(note?' — '+note:'');
+
+  if(lesType==='single'){
+    var date=document.getElementById('les-date').value;
+    var time=document.getElementById('les-time').value;
+    if(!date){showToast('請選擇日期');return;}
+    if(!time){showToast('請選擇時間');return;}
+    lessons.push({date:date,time:time,note:note,advance:adv,type:'single'});
+    scheduleNotification(date,time,adv,label);
+    showToast('上課提醒已加入 ✓');
+  } else {
+    var dStart=document.getElementById('les-date-start').value;
+    var dEnd=document.getElementById('les-date-end').value;
+    var time=document.getElementById('les-time-range').value;
+    var repeat=document.getElementById('les-repeat').value;
+    if(!dStart||!dEnd){showToast('請選擇日期範圍');return;}
+    if(!time){showToast('請選擇時間');return;}
+    if(dStart>dEnd){showToast('開始日期不能晚於結束日期');return;}
+    // Expand range into individual dates or store as range
+    if(repeat==='none'){
+      lessons.push({date:dStart,dateEnd:dEnd,time:time,note:note,advance:adv,type:'range'});
+    } else {
+      // Generate each date in range
+      var cur=new Date(dStart+'T00:00:00');
+      var end=new Date(dEnd+'T00:00:00');
+      var added=0;
+      while(cur<=end && added<60){
+        var dow=cur.getDay();
+        var skip=(repeat==='weekday'&&(dow===0||dow===6));
+        if(!skip){
+          var ds=cur.getFullYear()+'-'+pad(cur.getMonth()+1)+'-'+pad(cur.getDate());
+          lessons.push({date:ds,time:time,note:note,advance:adv,type:'single'});
+          if(added===0) scheduleNotification(ds,time,adv,label);
+          added++;
+        }
+        cur.setDate(cur.getDate()+1);
+      }
+      showToast(added+'天提醒已加入 ✓');
+    }
+    if(repeat==='none') showToast('日期範圍已加入 ✓');
+  }
+  saveAll();
+  document.getElementById('les-note').value='';
+  renderCal();
+}
+
+function delLesson(idx){
+  lessons.splice(idx,1);
+  saveAll();
+  renderCal();
+  showToast('提醒已刪除');
+}
+
+
+// ── Offline ────────────────────────────────────
+function updateOffline(){document.getElementById('offline-bar').classList.toggle('show',!navigator.onLine);}
+window.addEventListener('online',updateOffline);window.addEventListener('offline',updateOffline);updateOffline();
+
+
+// ── Lesson reminders ──────────────────────────
+(function(){
+  var d=new Date();d.setDate(d.getDate()+7);
+  var fmt=function(dt){return dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());};
+  var ld=document.getElementById('les-date');if(ld)ld.value=fmt(d);
+  var lt=document.getElementById('les-time');if(lt)lt.value=nowTime();
+  var d2=new Date(d);d2.setDate(d2.getDate()+3);
+  var ls=document.getElementById('les-date-start');if(ls)ls.value=fmt(d);
+  var le=document.getElementById('les-date-end');if(le)le.value=fmt(d2);
+  var lr=document.getElementById('les-time-range');if(lr)lr.value=nowTime();
+})();
+
+var lesType='single';
+function setLesType(type){
+  lesType=type;
+  document.getElementById('les-type-single').className='att-opt'+(type==='single'?' sel-present':'');
+  document.getElementById('les-type-range').className='att-opt'+(type==='range'?' sel-present':'');
+  document.getElementById('les-single-row').style.display=type==='single'?'':'none';
+  document.getElementById('les-range-row').style.display=type==='range'?'block':'none';
+}
+
+function addLesson(){
+  var note=document.getElementById('les-note').value.trim();
+  var adv=parseInt(document.getElementById('les-advance').value,10);
+  var label='🎹 鋼琴課'+(note?' — '+note:'');
+
+  if(lesType==='single'){
+    var date=document.getElementById('les-date').value;
+    var time=document.getElementById('les-time').value;
+    if(!date){showToast('請選擇日期');return;}
+    if(!time){showToast('請選擇時間');return;}
+    lessons.push({date:date,time:time,note:note,advance:adv,type:'single'});
+    scheduleNotification(date,time,adv,label);
+    showToast('上課提醒已加入 ✓');
+  } else {
+    var dStart=document.getElementById('les-date-start').value;
+    var dEnd=document.getElementById('les-date-end').value;
+    var time=document.getElementById('les-time-range').value;
+    var repeat=document.getElementById('les-repeat').value;
+    if(!dStart||!dEnd){showToast('請選擇日期範圍');return;}
+    if(!time){showToast('請選擇時間');return;}
+    if(dStart>dEnd){showToast('開始日期不能晚於結束日期');return;}
+    // Expand range into individual dates or store as range
+    if(repeat==='none'){
+      lessons.push({date:dStart,dateEnd:dEnd,time:time,note:note,advance:adv,type:'range'});
+    } else {
+      // Generate each date in range
+      var cur=new Date(dStart+'T00:00:00');
+      var end=new Date(dEnd+'T00:00:00');
+      var added=0;
+      while(cur<=end && added<60){
+        var dow=cur.getDay();
+        var skip=(repeat==='weekday'&&(dow===0||dow===6));
+        if(!skip){
+          var ds=cur.getFullYear()+'-'+pad(cur.getMonth()+1)+'-'+pad(cur.getDate());
+          lessons.push({date:ds,time:time,note:note,advance:adv,type:'single'});
+          if(added===0) scheduleNotification(ds,time,adv,label);
+          added++;
+        }
+        cur.setDate(cur.getDate()+1);
+      }
+      showToast(added+'天提醒已加入 ✓');
+    }
+    if(repeat==='none') showToast('日期範圍已加入 ✓');
+  }
+  saveAll();
+  document.getElementById('les-note').value='';
+  renderCal();
+}
+
+function delLesson(idx){
+  lessons.splice(idx,1);
+  saveAll();
+  renderCal();
+  showToast('提醒已刪除');
+}
+
+// ── Notebook ───────────────────────────────────
+
+
+
+// ── Offline ────────────────────────────────────
+function updateOffline(){document.getElementById('offline-bar').classList.toggle('show',!navigator.onLine);}
+window.addEventListener('online',updateOffline);window.addEventListener('offline',updateOffline);updateOffline();
+
+// ── Splash dismiss ─────────────────────────────
+(function(){
+  var splash=document.getElementById('splash');
+  if(!splash) return;
+  function hideSplash(){
+    if(splash._hidden) return;
+    splash._hidden = true;
+    splash.classList.add('hide');
+    setTimeout(function(){
+      splash.style.display='none';
+    }, 600);
+  }
+  // Always dismiss after 2.5s no matter what
+  var t = setTimeout(hideSplash, 2500);
+  // Also dismiss on tap
+  splash.addEventListener('click', function(){ clearTimeout(t); hideSplash(); });
+  // Failsafe: force remove after 4s even if transition failed
+  setTimeout(function(){
+    splash.style.display='none';
+    splash.style.opacity='0';
+  }, 4000);
+})();
+
+// ── Global error guard ─────────────────────────
+window.onerror=function(msg,src,line,col,err){
+  console.warn("App error:",msg,"@",src,line);
+  // Make sure splash is always dismissed even on error
+  var sp=document.getElementById("splash");
+  if(sp&&sp.style.display!=="none"){sp.style.display="none";}
+  return false;
+};
+
+// ── Service Worker ─────────────────────────────
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+</script>
+</body>
+</html>
